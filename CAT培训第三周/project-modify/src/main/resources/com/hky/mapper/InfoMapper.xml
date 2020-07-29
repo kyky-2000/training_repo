@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hky.mapper.InfoMapper" >
+  <resultMap id="BaseResultMap" type="com.hky.pojo.TransferInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="introduce" property="introduce" jdbcType="VARCHAR" />
+    <result column="photo" property="photo" jdbcType="VARCHAR" />
+    <result column="game_career1" property="gameCareer1" jdbcType="VARCHAR" />
+    <result column="game_career2" property="gameCareer2" jdbcType="VARCHAR" />
+    <result column="game_career3" property="gameCareer3" jdbcType="VARCHAR" />
+    <result column="salary" property="salary" jdbcType="INTEGER" />
+    <result column="boss" property="boss" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="deadline" property="deadline" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, name, introduce, photo, game_career1, game_career2, game_career3, salary, 
+    boss, status, deadline
+  </sql>
+
+  <select id="showInfo" parameterType="PageBean" resultType="TransferInfo">
+    select * from transfer_info
+    <where>
+      <if test="null != condition">
+        game_career1 = #{condition} or game_career2 = #{condition} or game_career3 = #{condition}
+      </if>
+      and status = #{status}
+    </where>
+    <if test="'正常' = status">
+    limit #{startIndex}, #{size}
+    </if>
+  </select>
+
+  <select id="selectCount" parameterType="PageBean" resultType="_int">
+    select count(*) from transfer_info
+    <where>
+      <if test="null != condition">
+        game_career1 = #{condition} or game_career2 = #{condition} or game_career3 = #{condition}
+      </if>
+      and status = #{status}
+    </where>
+  </select>
+
+  <select id="selectRotationPhotos">
+    select photo from transfer_info order by salary desc limit 0, 3
+  </select>
+
+  <insert id="applyForTransfer" parameterType="TransferInfo" >
+    insert into transfer_info (user_id, name, introduce, photo, game_career1, game_career2, game_career3, salary, status, deadline)
+    values (#{userId}, #{name}, #{introduce}, #{photo}, #{gameCareer1},  #{gameCareer2}, #{gameCareer3}, #{salary}, #{status}
+    <if test="deadline != null">
+      , #{deadline}
+    </if>
+    )
+  </insert>
+
+  <update id="updateInfo" parameterType="TransferInfo" >
+    update transfer_info
+    <set >
+      <if test="salary != null" >
+        salary = #{salary,jdbcType=INTEGER},
+      </if>
+      <if test="boss != null" >
+        boss = #{boss,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="deadline != null" >
+        deadline = #{deadline,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+
+  <delete id="deleteInfo">
+    delete from transfer_info where id = #{id}
+  </delete>>
+
+
+
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from transfer_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from transfer_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insertSelective" parameterType="com.hky.pojo.TransferInfo" >
+    insert into transfer_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="introduce != null" >
+        introduce,
+      </if>
+      <if test="photo != null" >
+        photo,
+      </if>
+      <if test="gameCareer1 != null" >
+        game_career1,
+      </if>
+      <if test="gameCareer2 != null" >
+        game_career2,
+      </if>
+      <if test="gameCareer3 != null" >
+        game_career3,
+      </if>
+      <if test="salary != null" >
+        salary,
+      </if>
+      <if test="boss != null" >
+        boss,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="deadline != null" >
+        deadline,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="introduce != null" >
+        #{introduce,jdbcType=VARCHAR},
+      </if>
+      <if test="photo != null" >
+        #{photo,jdbcType=VARCHAR},
+      </if>
+      <if test="gameCareer1 != null" >
+        #{gameCareer1,jdbcType=VARCHAR},
+      </if>
+      <if test="gameCareer2 != null" >
+        #{gameCareer2,jdbcType=VARCHAR},
+      </if>
+      <if test="gameCareer3 != null" >
+        #{gameCareer3,jdbcType=VARCHAR},
+      </if>
+      <if test="salary != null" >
+        #{salary,jdbcType=INTEGER},
+      </if>
+      <if test="boss != null" >
+        #{boss,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="deadline != null" >
+        #{deadline,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hky.pojo.TransferInfo" >
+    update transfer_info
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="introduce != null" >
+        introduce = #{introduce,jdbcType=VARCHAR},
+      </if>
+      <if test="photo != null" >
+        photo = #{photo,jdbcType=VARCHAR},
+      </if>
+      <if test="gameCareer1 != null" >
+        game_career1 = #{gameCareer1,jdbcType=VARCHAR},
+      </if>
+      <if test="gameCareer2 != null" >
+        game_career2 = #{gameCareer2,jdbcType=VARCHAR},
+      </if>
+      <if test="gameCareer3 != null" >
+        game_career3 = #{gameCareer3,jdbcType=VARCHAR},
+      </if>
+      <if test="salary != null" >
+        salary = #{salary,jdbcType=INTEGER},
+      </if>
+      <if test="boss != null" >
+        boss = #{boss,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="deadline != null" >
+        deadline = #{deadline,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

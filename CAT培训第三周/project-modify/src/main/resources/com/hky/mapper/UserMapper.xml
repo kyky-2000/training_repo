@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hky.mapper.UserMapper" >
+
+  <sql id="Base_Column_List" >
+    id, name, age, gender, mail, password, last_team, identity, join_date, profile, head,
+    status
+  </sql>
+
+  <select id="login" resultType="User" parameterType="User">
+    select * from user where mail = #{mail} and password = #{password}
+  </select>
+
+  <insert id="register" parameterType="User" >
+    insert into user (name, age, gender, mail, password, last_team, identity, join_date, profile, head, status)
+    values (#{name}, #{age},#{gender}, #{mail}, #{password}, #{lastTeam}, #{identity}, #{joinDate}, #{profile}, #{head}, #{status})
+  </insert>
+
+  <select id="selectUserByMail" resultType="User">
+    select * from user where mail = #{mail}
+  </select>
+
+  <select id="selectUserWithHistory" resultMap="UserAllInfo">
+    select * from user u, transfer_history t where u.id = #{id} and u.id = t.user_id
+  </select>
+  <resultMap id="UserAllInfo" type="User">
+    <id column="id" property="id"/>
+    <result column="name" property="name"/>
+    <result column="age" property="age"/>
+    <result column="gender" property="gender"/>
+    <result column="mail" property="mail"/>
+    <result column="password" property="password"/>
+    <result column="last_team" property="lastTeam"/>
+    <result column="identity" property="identity"/>
+    <result column="join_date" property="joinDate"/>
+    <result column="profile" property="profile"/>
+    <result column="head" property="head"/>
+    <result column="status" property="status"/>
+    <collection property="historyList" ofType="TransferHistory">
+      <result property="date" column="date"/>
+      <result property="team" column="team"/>
+    </collection>
+  </resultMap>
+
+  <select id="selectDetails" resultMap="UserDetails">
+    select * from user u,  highlight h where u.id = (select user_id from transfer_info where id = #{id}) and h.info_id = #{id}
+  </select>
+  <resultMap id="UserDetails" type="User">
+    <id column="id" property="id"/>
+    <result column="name" property="name"/>
+    <result column="age" property="age"/>
+    <result column="gender" property="gender"/>
+    <result column="mail" property="mail"/>
+    <result column="password" property="password"/>
+    <result column="last_team" property="lastTeam"/>
+    <result column="identity" property="identity"/>
+    <result column="join_date" property="joinDate"/>
+    <result column="profile" property="profile"/>
+    <result column="head" property="head"/>
+    <result column="status" property="status"/>
+    <collection property="pictures" ofType="String">
+      <result  column="picture" javaType="String"/>
+    </collection>
+  </resultMap>
+
+  <update id="updateByIdSelective" parameterType="User" >
+    update user
+    <set >
+      <if test="name != null" >
+        name = #{name},
+      </if>
+      <if test="age != null" >
+        age = #{age},
+      </if>
+      <if test="gender != null" >
+        gender = #{gender},
+      </if>
+      <if test="password != null" >
+        password = #{password},
+      </if>
+      <if test="lastTeam != null" >
+        last_team = #{lastTeam},
+      </if>
+      <if test="joinDate != null" >
+        join_date = #{joinDate},
+      </if>
+      <if test="profile != null" >
+        profile = #{profile},
+      </if>
+      <if test="head != null" >
+        head = #{head},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insertSelective" parameterType="com.hky.pojo.User" >
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="age != null" >
+        age,
+      </if>
+      <if test="gender != null" >
+        gender,
+      </if>
+      <if test="mail != null" >
+        mail,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="lastTeam != null" >
+        last_team,
+      </if>
+      <if test="identity != null" >
+        identity,
+      </if>
+      <if test="joindate != null" >
+        joinDate,
+      </if>
+      <if test="profile != null" >
+        profile,
+      </if>
+      <if test="head != null" >
+        head,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null" >
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="gender != null" >
+        #{gender,jdbcType=VARCHAR},
+      </if>
+      <if test="mail != null" >
+        #{mail,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="lastTeam != null" >
+        #{lastTeam,jdbcType=VARCHAR},
+      </if>
+      <if test="identity != null" >
+        #{identity,jdbcType=VARCHAR},
+      </if>
+      <if test="joindate != null" >
+        #{joindate,jdbcType=DATE},
+      </if>
+      <if test="profile != null" >
+        #{profile,jdbcType=VARCHAR},
+      </if>
+      <if test="head != null" >
+        #{head,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+</mapper>
