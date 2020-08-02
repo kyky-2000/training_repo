@@ -28,7 +28,7 @@
       </if>
       and status = #{status}
     </where>
-    <if test="'正常' = status">
+    <if test="'正常' == status">
     limit #{startIndex}, #{size}
     </if>
   </select>
@@ -43,7 +43,7 @@
     </where>
   </select>
 
-  <select id="selectRotationPhotos">
+  <select id="selectRotationPhotos" resultType="String">
     select photo from transfer_info order by salary desc limit 0, 3
   </select>
 
@@ -77,7 +77,7 @@
 
   <delete id="deleteInfo">
     delete from transfer_info where id = #{id}
-  </delete>>
+  </delete>
 
 
 

@@ -33,6 +33,8 @@ public class User {
 
     private List<String> pictures;
 
+    private List<Letter> letters;
+
     //前端传过来的图形验证码
     private String checkCode;
 
@@ -56,6 +58,14 @@ public class User {
         this.profile = profile;
         this.head = head;
         this.status = status;
+    }
+
+    public List<Letter> getLetters() {
+        return letters;
+    }
+
+    public void setLetters(List<Letter> letters) {
+        this.letters = letters;
     }
 
     public List<TransferHistory> getHistoryList() {
@@ -203,6 +213,7 @@ public class User {
                 ", status='" + status + '\'' +
                 ", historyList=" + historyList +
                 ", pictures=" + pictures +
+                ", letters=" + letters +
                 '}';
     }
 }

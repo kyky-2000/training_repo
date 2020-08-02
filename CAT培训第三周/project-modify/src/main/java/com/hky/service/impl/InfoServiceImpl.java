@@ -20,7 +20,7 @@ public class InfoServiceImpl implements InfoService {
 
     @Override
     public ResultInfo<PageBean<TransferInfo>> showInfo(PageBean<TransferInfo> pageBean) {
-        if(pageBean.getStatus().equals("正常")){
+        if(!pageBean.getStatus().equals("正常")){
             return showAuctionInfo(pageBean);
         }
 

@@ -1,6 +1,7 @@
 package com.hky.pojo;
 
 import java.util.Date;
+import java.util.List;
 
 public class TransferInfo {
     private Integer id;
@@ -26,6 +27,8 @@ public class TransferInfo {
     private String status;
 
     private Date deadline;
+
+    private List<String> pictures;
 
     public Integer getId() {
         return id;
@@ -121,5 +124,13 @@ public class TransferInfo {
 
     public void setDeadline(Date deadline) {
         this.deadline = deadline;
+    }
+
+    public List<String> getPictures() {
+        return pictures;
+    }
+
+    public void setPictures(List<String> pictures) {
+        this.pictures = pictures;
     }
 }

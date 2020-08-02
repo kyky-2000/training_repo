@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -19,20 +19,12 @@
     <script type="text/javascript" src="js/carousel.js"></script>
 
     <script>
-        var user = $.parseJSON(sessionStorage.getItem("json"));
-        var uID;
-        var username;
-        var identity;
-        if(user!=null) {
-            uID = user.ID;
-            username = user.name;
-            identity = user.identity;
-        }
+        var user;
+
         function deleteInfo(ID){
-            var json = {"ID": ID+"", "name": "Info"};
             $.ajax({
-                url: "baseServlet/manager/delete",
-                data: {"json": JSON.stringify(json)},
+                url: "info/delete",
+                data: {"ID": ID},
                 type: "POST",
                 dataType: "json",
                 success: function (data) {
@@ -61,36 +53,49 @@
 
         function searchPhotos() {
             $.ajax({
-                url: "baseServlet/info/searchPhotos",
+                url: "user/getUser",
+                type: "post",
+                dataType:"json",
+                success: function (data) {
+                    user = data;
+                },
+                error: function () {
+                    alert("服务器繁忙！！！");
+                }
+            });
+            $.ajax({
+                url: "info/selectRotationPhotos",
                 type: "POST",
                 data: {"json": null},
                 dataType: "json",
                 success: function (data) {
-                    var photos = data.data;
-                    for (var i = 0; i < photos.length; ++i) {
-                        $("#photo" + (i + 1)).attr("src", "theme/userImages/" + photos[i].photo + "");
-                    }
+                    var photoList = data.data;
+                    $("#photo1").attr("src", "images/info-images/"+photoList[0]+"");
+                    $("#photo2").attr("src", "images/info-images/"+photoList[1]+"");
+                    $("#photo3").attr("src", "images/info-images/"+photoList[2]+"");
                 }
-            })
-            showInfo(1, "");
+            });
+            showInfo(1, null);
         }
 
         function showInfo(currentPage, gameCareer){
             $.ajax({
-                url: "baseServlet/info/searchInfo",
+                url: "info/showInfo",
                 type: "POST",
-                data: {"json": JSON.stringify({"currentPage": currentPage+"", "size": 9+"", "gameCareer": gameCareer})},
+                data: {"currentPage": currentPage, "size": 9, "gameCareer": gameCareer, "status": "正常"},
                 dataType: "json",
                 success: function (data) {
                     $(".col-md-4").remove();
-                    var list = data.data.list;
+                    var list = data.data.dataList;
+                    var id;
                     for(var i=0; i<list.length; ++i){
                         // if(user != null && user.identity == "战队管理层"){
+                        id = list[i].id;
                         if(user != null ){
                             $("#info_group").append("" +
                                 "<div class=\"col-sm-6 col-md-4\"style='height: 600px'>\n" +
                                 "                <div class=\"thumbnail\" style='height: 70%'>\n" +
-                                "                    <img src=\"./theme/userImages/"+list[i].photo+"\" style='height: 30%'>\n" +
+                                "                    <img src=\"images/info-images/"+list[i].photo+"\" style='height: 30%'>\n" +
                                 "                    <div class=\"caption\">\n" +
                                 "                        <h2>"+list[i].name+"</h2>\n" +
                                 "                        <p style=\"color: #0000FF; font-size: large\">\n" +
@@ -102,8 +107,8 @@
                                 "                        <p>\n" +
                                 "                            "+list[i].introduce+"\n" +
                                 "                        </p>\n" +
-                                "                        <p><a class=\"btn btn-primary\" onclick=\"turnPersonal1("+list[i].ID+",'"+list[i].name+"');\">详情</a> " +
-                                "                          <a class=\"btn btn-default\" role=\"button\" onclick='deleteInfo("+list[i].ID+")'>邀请</a> <a class=\"btn btn-default\" role=\"button\" onclick=\"updateInformation('"+list[i].name+"');\">举报</a></p>\n" +
+                                "                        <p><a class=\"btn btn-primary\" onclick=\"turnDetails("+id+");\">详情</a> " +
+                                "                          <a class=\"btn btn-default\" role=\"button\" onclick='deleteInfo("+id+")'>邀请</a> <a class=\"btn btn-default\" role=\"button\" onclick=\"updateInformation('"+list[i].name+"');\">举报</a></p>\n" +
                                 "                    </div>\n" +
                                 "                </div>\n" +
                                 "            </div>");
@@ -117,7 +122,7 @@
                             $("#info_group").append("" +
                                 "<div class=\"col-sm-6 col-md-4\"style='height: 600px'>\n" +
                                 "                <div class=\"thumbnail\" style='height: 70%'>\n" +
-                                "                    <img src=\"./theme/userImages/"+list[i].photo+"\" style='height: 30%'>\n" +
+                                "                    <img src=\"images/info-images/"+list[i].photo+"\" style='height: 30%'>\n" +
                                 "                    <div class=\"caption\">\n" +
                                 "                        <h2>"+list[i].name+"</h2>\n" +
                                 "                        <p style=\"color: #0000FF; font-size: large\">\n" +
@@ -137,6 +142,7 @@
 
                     var pageBean = data.data;
                     $("#pageNumber").empty();
+
                     if(pageBean.currentPage == 1){
                         $("#pageNumber").append("" +
                             "<li class=\"disabled\" id=\"right\">\n" +
@@ -154,6 +160,7 @@
                             "</li>" +
                             "");
                     }
+
                     for(var j=1; j<=pageBean.totalPage; ++j){
                         if(j == pageBean.currentPage){
                             $("#pageNumber").append("" +
@@ -167,6 +174,7 @@
                                 "");
                         }
                     }
+
                     $("#pageNumber").append("" +
                         "<li id=\"left\">\n" +
                         "      <a aria-label=\"Next\">\n" +
@@ -201,23 +209,15 @@
                 showInfo(currentPage - 1, gameCareer);
             });
         }
-        function turnPersonal1(ID, name) {
-            var user = {"name": name, "ID": ID+"", "master": username, "masterID": uID, "identity": identity};
-            var json = {"user": user, "status": 1};
+        function turnDetails(id) {
+            var json = {"id": id};
             sessionStorage.setItem("json", JSON.stringify(json));
-            window.location.href = "/person_page.jsp";
+            window.location.href = "${pageContext.request.contextPath}/details.jsp";
         }
-        function turnPersonal2() {
-            var user = {"name": username, "ID": uID+"", "identity": identity};
-            var json = {"user": user, "status": 0};
-
-            sessionStorage.setItem("json", JSON.stringify(json));
-            window.location.href = "/person_page.jsp";
+        function turnPersonal() {
+            window.location.href = "${pageContext.request.contextPath}/person_page.jsp";
         }
         function addInfo(){
-            var user = {"master": username, "masterID": uID, "identity": identity};
-            var json = {"user": user};
-            sessionStorage.setItem("json", JSON.stringify(json));
             window.location.href = "/addInfo.jsp";
         }
         function turnAction(){
@@ -267,14 +267,14 @@
                     <div class="layui-carousel" id="carousel02" >
                         <div carousel-item style="width: 1000px; height: 500px">
                             <div>
-                                <img src="theme/images/uzi.jpg" id="photo1"/>
+                                <img src="images/uzi.jpg" id="photo1"/>
                                 </a>
                             </div>
                             <div>
-                                <img src="theme/images/uzi.jpg" id="photo2"/>
+                                <img src="images/uzi.jpg" id="photo2"/>
                             </div>
                             <div>
-                                <img src="theme/images/uzi.jpg" id="photo3"/>
+                                <img src="images/uzi.jpg" id="photo3"/>
                             </div>
                         </div>
                     </div>
@@ -290,7 +290,7 @@
 <div style="float: end; margin: 5px">
     <p>
         <button type="button" class="btn btn-warning" onclick="turnAction()" style="width: 100px; height: 48px; font-size: large">拍卖场</button>
-        <button type="button" class="btn btn-info btn-lg" onclick="turnPersonal2()">个人信息</button>
+        <button type="button" class="btn btn-info btn-lg" onclick="turnPersonal()">个人信息</button>
         <a><button type="button" class="btn btn-success btn-lg" onclick="addInfo()">提交转会申请</button></a>
     </p>
 </div>

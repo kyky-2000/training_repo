@@ -1,9 +1,12 @@
 package com.hky.mapper;
 
+import com.hky.pojo.Letter;
 import com.hky.pojo.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface UserMapper {
@@ -22,11 +25,11 @@ public interface UserMapper {
     int register(User user);
 
     /**
-     * 根据id查询用户
+     * 根据转会信息的id查询用户id
      * @param id
      * @return
      */
-    User selectByPrimaryKey(Integer id);
+    int selectUserIdByInfoId(int id);
 
     /**
      * 更新用户信息
@@ -43,18 +46,32 @@ public interface UserMapper {
     User selectUserByMail(@Param("mail") String mail);
 
     /**
-     * 查询用户个人信息及转会历史
+     * 查询用户信息（包括转会历史）
      * @param id
      * @return
      */
     User selectUserWithHistory(@Param("id") int id);
 
     /**
-     * 查询个人信息及高光时刻
+     *查询高光时刻
      * @param id
      * @return
      */
-    User selectDetails(@Param("id") int id);
+    List<String> selectHighlight(@Param("id") int id);
+
+    /**
+     * 查询用户收到的私信
+     * @param id
+     * @return
+     */
+    List<Letter> showLetters(@Param("id") int id);
+
+    /**
+     * 回复私信
+     * @param letter
+     * @return
+     */
+    int reply(Letter letter);
 
 
     int deleteByPrimaryKey(Integer id);

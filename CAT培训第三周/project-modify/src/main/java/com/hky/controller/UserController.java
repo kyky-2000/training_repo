@@ -1,11 +1,13 @@
 package com.hky.controller;
 
+import com.hky.pojo.Letter;
 import com.hky.pojo.ResultInfo;
 import com.hky.pojo.User;
 import com.hky.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,8 +22,9 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     @Autowired
     private UserService userService;
+
     @RequestMapping("/testAjax")
-    public String testAjax(User user){
+    public String testAjax(@RequestBody User user){
         System.out.println(user);
         System.out.println("执行完事了，我要跳转啦");
         return "success";
@@ -34,6 +37,12 @@ public class UserController {
 //        modelAndView.setViewName("success");
 //        return modelAndView;
 //    }
+
+    @RequestMapping("/testPicture")
+    public @ResponseBody ResultInfo<String> testPicture(){
+        System.out.println("图片给你了");
+        return new ResultInfo<>(200, "展示图片了", "1.jpg");
+    }
 
     @RequestMapping("/login")
     public @ResponseBody ResultInfo<User> login(User user, HttpServletRequest request){
@@ -51,6 +60,13 @@ public class UserController {
             request.getSession().setAttribute("user", resultInfo.getData());
         }
         return resultInfo;
+    }
+
+    @RequestMapping("/getUser")
+    public @ResponseBody User getUser(ModelMap modelMap){
+        User user = (User)modelMap.get("user");
+        user = new User(1, "小李子", 25, "男", "753@qq.com", "123456", "RNG", "职业选手", null, "来了来了", "1.jpg", "正常");
+        return user;
     }
 
     @RequestMapping("/register")
@@ -80,14 +96,23 @@ public class UserController {
         return userService.selectUserByMail(mail);
     }
 
-    @RequestMapping("selectUserWithHistory")
-    public @ResponseBody ResultInfo<User> selectUserWithHistory(int id){
-        return userService.selectUserWithHistory(id);
+    @RequestMapping("selectAllUserInfo")
+    public @ResponseBody ResultInfo<User> selectAllUserInfo(HttpServletRequest request){
+        User user = (User)request.getSession().getAttribute("user");
+        return userService.selectAllUserInfo(user.getId());
     }
 
     @RequestMapping("selectDetails")
-    public @ResponseBody ResultInfo<User> selectDetails(int id){
+    public @ResponseBody ResultInfo<User> selectDetails(Integer id){
+        System.out.println(id);
         return userService.selectDetails(id);
+    }
+
+    @RequestMapping("reply")
+    public @ResponseBody ResultInfo<String> reply(Letter letter, HttpServletRequest request){
+        User user = (User)request.getSession().getAttribute("user");
+        letter.setSender(user.getName());
+        return userService.reply(letter);
     }
 
 }

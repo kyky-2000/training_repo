@@ -92,7 +92,7 @@
         </div>
         <div class="form-group" style="text-align: center">
             <input class="btn btn-primary" type="submit" value="提交" onclick="update()"/>
-            <a href="${pageContext.request.contextPath}/person_page.jsp"><input class="btn btn-default" type="button" value="返回"/></a>
+            <a href="${pageContext.request.contextPath}/details.jsp"><input class="btn btn-default" type="button" value="返回"/></a>
         </div>
     </form>
 </div>

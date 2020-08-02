@@ -1,5 +1,6 @@
 package com.hky.service;
 
+import com.hky.pojo.Letter;
 import com.hky.pojo.ResultInfo;
 import com.hky.pojo.User;
 import org.apache.ibatis.annotations.Param;
@@ -15,7 +16,9 @@ public interface UserService {
 
     ResultInfo<User> selectUserByMail(String mail);
 
-    ResultInfo<User> selectUserWithHistory(int id);
+    ResultInfo<User> selectAllUserInfo(int id);
 
     ResultInfo<User> selectDetails(int id);
+
+    ResultInfo<String> reply(Letter letter);
 }

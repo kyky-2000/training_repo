@@ -5,7 +5,7 @@
   Time: 10:19
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <html>
 <head>
     <title>登录页面</title>
@@ -30,18 +30,17 @@
                 type: "post",
                 dataType: "json",
                 success: function(data) {
-                    alert(data.msg)
-                    // if(data.code == 200) {
-                        // alert(data.data.name + "用户， 欢迎您");
-                        // sessionStorage.setItem("json", JSON.stringify(data.data));
-                        // if(data.data.identity == "管理员"){
-                        //     window.location.href = "/manager.jsp";
-                        // }else{
-                        //     window.location.href = "/home.jsp";
-                        // }
-                    // }
-                    // else
-                    //     alert(data.msg);
+                    alert(data.msg);
+                    if(data.code == 200) {
+                        alert(data.data.name + "用户， 欢迎您");
+                        if(data.data.identity == "管理员"){
+                            window.location.href = "/manager.jsp";
+                        }else{
+                            window.location.href = "${pageContext.request.contextPath}/home.jsp";
+                        }
+                    }
+                    else
+                        alert(data.msg);
                 }
             });
         }    </script>

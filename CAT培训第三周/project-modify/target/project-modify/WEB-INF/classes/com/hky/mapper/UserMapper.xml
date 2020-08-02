@@ -20,8 +20,12 @@
     select * from user where mail = #{mail}
   </select>
 
+  <select id="selectUserIdByInfoId" parameterType="_int" resultType="_int">
+    select user_id from transfer_info where id = #{id}
+  </select>
+
   <select id="selectUserWithHistory" resultMap="UserAllInfo">
-    select * from user u, transfer_history t where u.id = #{id} and u.id = t.user_id
+    select * from user u left join transfer_history t on u.id = t.user_id where u.id = #{id};
   </select>
   <resultMap id="UserAllInfo" type="User">
     <id column="id" property="id"/>
@@ -42,30 +46,17 @@
     </collection>
   </resultMap>
 
-  <select id="selectDetails" resultMap="UserDetails">
-    select * from user u,  highlight h where u.id = (select user_id from transfer_info where id = #{id}) and h.info_id = #{id}
+  <select id="selectHighlight" resultType="String">
+    select picture from highlight where id = #{id}
   </select>
-  <resultMap id="UserDetails" type="User">
-    <id column="id" property="id"/>
-    <result column="name" property="name"/>
-    <result column="age" property="age"/>
-    <result column="gender" property="gender"/>
-    <result column="mail" property="mail"/>
-    <result column="password" property="password"/>
-    <result column="last_team" property="lastTeam"/>
-    <result column="identity" property="identity"/>
-    <result column="join_date" property="joinDate"/>
-    <result column="profile" property="profile"/>
-    <result column="head" property="head"/>
-    <result column="status" property="status"/>
-    <collection property="pictures" ofType="String">
-      <result  column="picture" javaType="String"/>
-    </collection>
-  </resultMap>
 
+  <select id="showLetters" resultType="Letter">
+    select * from letter where addressee = (select name from user where id = #{id})
+  </select>
 
-
-
+  <insert id="reply" parameterType="Letter">
+     insert into letter(addressee, sender, content) value(#{addressee}, #{sender}, #{content})
+ </insert>
 
 
   <update id="updateByIdSelective" parameterType="User" >
@@ -81,42 +72,29 @@
         gender = #{gender},
       </if>
       <if test="password != null" >
-        password = #{password,jdbcType=VARCHAR},
+        password = #{password},
       </if>
       <if test="lastTeam != null" >
-        last_team = #{lastTeam,jdbcType=VARCHAR},
+        last_team = #{lastTeam},
       </if>
-      <if test="identity != null" >
-        identity = #{identity,jdbcType=VARCHAR},
-      </if>
-      <if test="joindate != null" >
-        joinDate = #{joindate,jdbcType=DATE},
+      <if test="joinDate != null" >
+        join_date = #{joinDate},
       </if>
       <if test="profile != null" >
-        profile = #{profile,jdbcType=VARCHAR},
+        profile = #{profile},
       </if>
       <if test="head != null" >
-        head = #{head,jdbcType=VARCHAR},
+        head = #{head},
       </if>
     </set>
     where id = #{id}
   </update>
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from user
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.hky.pojo.User" >
-    insert into user (name, age,
-      gender, mail, password, 
-      last_team, identity, join_date,
-      profile, head, status
-      )
-    values (#{name,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER},
-      #{gender,jdbcType=VARCHAR}, #{mail,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{lastTeam,jdbcType=VARCHAR}, #{identity,jdbcType=VARCHAR}, #{joinDate,jdbcType=DATE},
-      #{profile,jdbcType=VARCHAR}, #{head,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}
-      )
-  </insert>
   <insert id="insertSelective" parameterType="com.hky.pojo.User" >
     insert into user
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -196,58 +174,4 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.hky.pojo.User" >
-    update user
-    <set >
-      <if test="name != null" >
-        name = #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="age != null" >
-        age = #{age,jdbcType=INTEGER},
-      </if>
-      <if test="gender != null" >
-        gender = #{gender,jdbcType=VARCHAR},
-      </if>
-      <if test="mail != null" >
-        mail = #{mail,jdbcType=VARCHAR},
-      </if>
-      <if test="password != null" >
-        password = #{password,jdbcType=VARCHAR},
-      </if>
-      <if test="lastTeam != null" >
-        last_team = #{lastTeam,jdbcType=VARCHAR},
-      </if>
-      <if test="identity != null" >
-        identity = #{identity,jdbcType=VARCHAR},
-      </if>
-      <if test="joindate != null" >
-        joinDate = #{joindate,jdbcType=DATE},
-      </if>
-      <if test="profile != null" >
-        profile = #{profile,jdbcType=VARCHAR},
-      </if>
-      <if test="head != null" >
-        head = #{head,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null" >
-        status = #{status,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.hky.pojo.User" >
-    update user
-    set name = #{name,jdbcType=VARCHAR},
-      age = #{age,jdbcType=INTEGER},
-      gender = #{gender,jdbcType=VARCHAR},
-      mail = #{mail,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
-      last_team = #{lastTeam,jdbcType=VARCHAR},
-      identity = #{identity,jdbcType=VARCHAR},
-      joinDate = #{joindate,jdbcType=DATE},
-      profile = #{profile,jdbcType=VARCHAR},
-      head = #{head,jdbcType=VARCHAR},
-      status = #{status,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
 </mapper>

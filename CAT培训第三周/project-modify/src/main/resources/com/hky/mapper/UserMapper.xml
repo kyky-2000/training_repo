@@ -20,8 +20,12 @@
     select * from user where mail = #{mail}
   </select>
 
+  <select id="selectUserIdByInfoId" parameterType="_int" resultType="_int">
+    select user_id from transfer_info where id = #{id}
+  </select>
+
   <select id="selectUserWithHistory" resultMap="UserAllInfo">
-    select * from user u, transfer_history t where u.id = #{id} and u.id = t.user_id
+    select * from user u left join transfer_history t on u.id = t.user_id where u.id = #{id};
   </select>
   <resultMap id="UserAllInfo" type="User">
     <id column="id" property="id"/>
@@ -42,26 +46,18 @@
     </collection>
   </resultMap>
 
-  <select id="selectDetails" resultMap="UserDetails">
-    select * from user u,  highlight h where u.id = (select user_id from transfer_info where id = #{id}) and h.info_id = #{id}
+  <select id="selectHighlight" resultType="String">
+    select picture from highlight where id = #{id}
   </select>
-  <resultMap id="UserDetails" type="User">
-    <id column="id" property="id"/>
-    <result column="name" property="name"/>
-    <result column="age" property="age"/>
-    <result column="gender" property="gender"/>
-    <result column="mail" property="mail"/>
-    <result column="password" property="password"/>
-    <result column="last_team" property="lastTeam"/>
-    <result column="identity" property="identity"/>
-    <result column="join_date" property="joinDate"/>
-    <result column="profile" property="profile"/>
-    <result column="head" property="head"/>
-    <result column="status" property="status"/>
-    <collection property="pictures" ofType="String">
-      <result  column="picture" javaType="String"/>
-    </collection>
-  </resultMap>
+
+  <select id="showLetters" resultType="Letter">
+    select * from letter where addressee = (select name from user where id = #{id})
+  </select>
+
+  <insert id="reply" parameterType="Letter">
+     insert into letter(addressee, sender, content) value(#{addressee}, #{sender}, #{content})
+ </insert>
+
 
   <update id="updateByIdSelective" parameterType="User" >
     update user

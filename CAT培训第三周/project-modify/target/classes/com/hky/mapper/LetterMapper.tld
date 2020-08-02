@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hky.mapper.LetterMapper" >
+    <select id="showLetters" resultType="Letter">
+        select * from letter where addressee = #{addressee}
+    </select>
+
+    <insert id="reply" parameterType="Letter">
+        insert into letter(addressee, sender, content) value(#{addressee}, #{sender}, #{content})
+    </insert>
+</mapper>

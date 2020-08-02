@@ -1,6 +1,7 @@
 package com.hky.service.impl;
 
 import com.hky.mapper.UserMapper;
+import com.hky.pojo.Letter;
 import com.hky.pojo.ResultInfo;
 import com.hky.pojo.User;
 import com.hky.service.UserService;
@@ -15,6 +16,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -68,8 +70,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResultInfo<User> selectUserWithHistory(int id){
+    public ResultInfo<User> selectAllUserInfo(int id){
         User user =  userMapper.selectUserWithHistory(id);
+        List<Letter> letterList = userMapper.showLetters(id);
         System.out.println(user);
         if(null == user){
             return new ResultInfo<User>(500, "用户不存在", null);
@@ -80,7 +83,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResultInfo<User> selectDetails(int id){
-        User user = userMapper.selectDetails(id);
+        int userId = userMapper.selectUserIdByInfoId(id);
+        User user = userMapper.selectUserWithHistory(userId);
+        List<String> pictures = userMapper.selectHighlight(id);
+        user.setPictures(pictures);
         System.out.println(user);
         if(null == user){
             return new ResultInfo<User>(500, "服务器繁忙", null);
@@ -89,5 +95,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public ResultInfo<String> reply(Letter letter){
+        int result = userMapper.reply(letter);
+        if(1 == result){
+            return new ResultInfo<String>(200, "修改成功", null);
+        }else{
+            return new ResultInfo<String>(500, "系统繁忙，请稍后重试", null);
+        }
+    }
 
 }

@@ -28,7 +28,7 @@
       </if>
       and status = #{status}
     </where>
-    <if test="'正常' = status">
+    <if test="'正常' == status">
     limit #{startIndex}, #{size}
     </if>
   </select>
@@ -43,7 +43,7 @@
     </where>
   </select>
 
-  <select id="selectRotationPhotos">
+  <select id="selectRotationPhotos" resultType="String">
     select photo from transfer_info order by salary desc limit 0, 3
   </select>
 
@@ -74,6 +74,10 @@
     </set>
     where id = #{id}
   </update>
+
+  <delete id="deleteInfo">
+    delete from transfer_info where id = #{id}
+  </delete>
 
 
 
@@ -204,21 +208,6 @@
         deadline = #{deadline,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.hky.pojo.TransferInfo" >
-    update transfer_info
-    set user_id = #{userId,jdbcType=INTEGER},
-      name = #{name,jdbcType=VARCHAR},
-      introduce = #{introduce,jdbcType=VARCHAR},
-      photo = #{photo,jdbcType=VARCHAR},
-      game_career1 = #{gameCareer1,jdbcType=VARCHAR},
-      game_career2 = #{gameCareer2,jdbcType=VARCHAR},
-      game_career3 = #{gameCareer3,jdbcType=VARCHAR},
-      salary = #{salary,jdbcType=INTEGER},
-      boss = #{boss,jdbcType=VARCHAR},
-      status = #{status,jdbcType=VARCHAR},
-      deadline = #{deadline,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
